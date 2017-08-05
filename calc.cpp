@@ -45,6 +45,7 @@ TNumeral StrToTNumeral(string str) {
 	res.Atoms.resize(n_size);
 
 	size_t current_tmp = 0;
+	size_t current_size = 0;
 	unsigned int tmp = 0;
 	bool first = true;
 
@@ -64,13 +65,11 @@ TNumeral StrToTNumeral(string str) {
 		unsigned int dec_pow = DecPow(ATOM_SIZE);
 		if (current_tmp > ATOM_SIZE) {
 			unsigned int current_value = tmp % dec_pow;
-			size_t current_size = res.Atoms.size();
-			if (first) {
-				current_size = 0;
-			}/* else {
-				res.Atoms.resize(res.Atoms.size() + 1);
-				cout << "Current size = " << res.Atoms.size() << endl;
-			}*/
+			//size_t current_size = res.Atoms.size();
+			//cout << "current_size = " << current_size << endl;
+			if (!first) {
+				current_size++;
+			}
 			res.Atoms[current_size] = current_value;
 			tmp /= dec_pow;
 			current_tmp = 1;
@@ -263,7 +262,7 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 	return res;
 }
 
-/*TNumeral operator *(TNumeral const &a, TNumeral const &b) {
+TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 	TNumeral res;
 	if (a.Error || b.Error) {
 		res.Error = true;
@@ -292,5 +291,5 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 	return res;
-}*/
+}
 
