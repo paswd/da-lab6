@@ -43,8 +43,16 @@ bool TNumeral::IsZero(void) const {
 }
 TNumeral StrToTNumeral(string str) {
 	TNumeral res;
-	size_t n_size = str.size() / ATOM_SIZE;
-	if (str.size() % ATOM_SIZE > 0) {
+	size_t begin = 0;
+	for (size_t j = 0; j < str.size(); j++) {
+		if (str[j] != '0') {
+			break;
+		}
+		begin++;
+	}
+	size_t real_size = max(str.size() - begin, (size_t) 1);
+	size_t n_size = real_size / ATOM_SIZE;
+	if (real_size % ATOM_SIZE > 0) {
 		n_size++;
 	}
 	//cout << "N_SIZE = " << n_size << endl;
@@ -55,7 +63,8 @@ TNumeral StrToTNumeral(string str) {
 	unsigned int tmp = 0;
 	bool first = true;
 
-	for (size_t j = str.size(); j > 0; j--) {
+
+	for (size_t j = str.size(); j > begin; j--) {
 		size_t i = j - 1;
 		if (!IsCharNum(str[i])) {
 			res.Error = true;
