@@ -16,6 +16,8 @@ public:
 	~TNumeral(void);
 
 	TNumeral& operator =(const TNumeral &num);
+
+	bool IsZero(void) const;
 };
 
 TNumeral StrToTNumeral(std::string str);

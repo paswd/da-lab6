@@ -35,6 +35,12 @@ TNumeral& TNumeral::operator =(const TNumeral &num) {
 	this->Error = num.Error;
 	return *this;
 }
+bool TNumeral::IsZero(void) const {
+	if (this->Atoms.size() == 1 && this->Atoms[0] == 0) {
+		return true;
+	}
+	return false;
+}
 TNumeral StrToTNumeral(string str) {
 	TNumeral res;
 	size_t n_size = str.size() / ATOM_SIZE;
@@ -206,23 +212,44 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 	
 	unsigned int tmp = 0;
 	
-	res.Atoms.resize(max(a.Atoms.size(), b.Atoms.size()));
-	if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
+	//res.Atoms.resize(max(a.Atoms.size(), b.Atoms.size()));
+	if (a.Atoms.size() > b.Atoms.size()) {
+		res = a;
+	} else if (a.Atoms.size() < b.Atoms.size()) {
+		res = b;
+	} else {
+		res.Atoms.resize(a.Atoms.size());
+	}
+	/*if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
 		res.Error = true;
 		return res;
-	}
+	}*/
 	size_t max_i = min(a.Atoms.size(), b.Atoms.size());
 	unsigned int divider = DecPow(ATOM_SIZE);
+	//cout << "max_i = " << max_i << endl;
 	for (size_t i = 0; i < max_i; i++) {
+		//cout << "i = " << i << endl;
 		res.Atoms[i] = a.Atoms[i] + b.Atoms[i];
+		//cout << "res.Atoms[i] (0) = " << res.Atoms[i] << endl;
 		res.Atoms[i] += tmp;
+		//cout << "res.Atoms[i] (1) = " << res.Atoms[i] << endl;
 		tmp = res.Atoms[i] / divider;
 		res.Atoms[i] %= divider;
+		//cout << "res.Atoms[i] (2) = " << res.Atoms[i] << endl;
+		//cout << "res = " << res << endl;
 	}
-	if (tmp != 0) {
-		size_t current = res.Atoms.size();
-		res.Atoms.resize(res.Atoms.size() + 1);
-		res.Atoms[current] = tmp;
+	while (tmp != 0) {
+		size_t current = max_i;
+		if (current >= res.Atoms.size()) {
+			res.Atoms.resize(current + 1);
+			res.Atoms[current] = 0;
+		}
+		/*size_t current = res.Atoms.size();
+		res.Atoms.resize(res.Atoms.size() + 1);*/
+		res.Atoms[current] += tmp;
+		tmp = res.Atoms[current] / divider;
+		res.Atoms[current] %= divider;
+		max_i++;
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 	return res;
@@ -268,26 +295,57 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		res.Error = true;
 		return res;
 	}
+
+	//Now `res` is zero
+	if (a.IsZero() || b.IsZero()) {
+		return res;
+	}
 	
 	unsigned int tmp = 0;
 	
-	res.Atoms.resize(max(a.Atoms.size(), b.Atoms.size()));
+	/*res.Atoms.resize(a.Atoms.size() + b.Atoms.size());
 	if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
 		res.Error = true;
 		return res;
-	}
-	size_t max_i = min(a.Atoms.size(), b.Atoms.size());
+	}*/
+	//size_t max_i = min(a.Atoms.size(), b.Atoms.size());
 	unsigned int divider = DecPow(ATOM_SIZE);
-	for (size_t i = 0; i < max_i; i++) {
-		res.Atoms[i] = a.Atoms[i] * b.Atoms[i];
-		res.Atoms[i] += tmp;
-		tmp = res.Atoms[i] / divider;
-		res.Atoms[i] %= divider;
-	}
-	if (tmp != 0) {
-		size_t current = res.Atoms.size();
-		res.Atoms.resize(res.Atoms.size() + 1);
-		res.Atoms[current] = tmp;
+	//unsigned int now_dec = 1;
+
+	for (size_t j = 0; j < b.Atoms.size(); j++) {
+		TNumeral res_tmp;
+		res_tmp.Atoms.resize(1 + j);
+		for (size_t i = 0; i <= j; i++) {
+			res_tmp.Atoms[i] = 0;
+		}
+		size_t k = 0;
+		for (size_t i = 0; i < a.Atoms.size(); i++) {
+			k = i + j;
+			if (k >= res_tmp.Atoms.size()) {
+				res_tmp.Atoms.resize(k + 1);
+			}
+			res_tmp.Atoms[k] = a.Atoms[i] * b.Atoms[j];
+			res_tmp.Atoms[k] += tmp;
+			tmp = res_tmp.Atoms[k] / divider;
+			res_tmp.Atoms[k] %= divider;
+		}
+
+		if (tmp != 0) {
+			cout << "Tmp = " << tmp << endl;
+			size_t current = res_tmp.Atoms.size() + j;
+			cout << "Current = " << current << endl;
+			res_tmp.Atoms.resize(res_tmp.Atoms.size() + 1);
+			res_tmp.Atoms[current] = tmp;
+		}
+		cout << "res_tmp = " << res_tmp << endl;
+		res = res + res_tmp;
+		//now_dec *= 10;
+
+		/*if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
+			res.Error = true;
+			res.Atoms.resize(0);
+			return res;
+		}*/
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 	return res;
