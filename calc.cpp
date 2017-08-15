@@ -322,6 +322,7 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 	//unsigned int now_dec = 1;
 
 	for (size_t j = 0; j < b.Atoms.size(); j++) {
+		tmp = 0;
 		TNumeral res_tmp;
 		res_tmp.Atoms.resize(1 + j);
 		for (size_t i = 0; i <= j; i++) {
@@ -340,8 +341,9 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		}
 
 		if (tmp != 0) {
+			cout << "j = " << j << endl;
 			cout << "Tmp = " << tmp << endl;
-			size_t current = res_tmp.Atoms.size() + j;
+			size_t current = res_tmp.Atoms.size();
 			cout << "Current = " << current << endl;
 			res_tmp.Atoms.resize(res_tmp.Atoms.size() + 1);
 			res_tmp.Atoms[current] = tmp;
