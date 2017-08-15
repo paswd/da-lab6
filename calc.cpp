@@ -19,8 +19,8 @@ TNumeral::TNumeral(void) {
 TNumeral::~TNumeral(void) {
 }
 
-unsigned int DecPow(size_t index) {
-	unsigned int res = 1;
+TNumBasic DecPow(size_t index) {
+	TNumBasic res = 1;
 	for (size_t i = 0; i < index; i++) {
 		res *= 10;
 	}
@@ -60,7 +60,7 @@ TNumeral StrToTNumeral(string str) {
 
 	size_t current_tmp = 0;
 	size_t current_size = 0;
-	unsigned int tmp = 0;
+	TNumBasic tmp = 0;
 	bool first = true;
 
 
@@ -72,14 +72,14 @@ TNumeral StrToTNumeral(string str) {
 		}
 
 		//tmp *= 10;
-		tmp += (unsigned int) CharToUNum(str[i]) * DecPow(current_tmp);
+		tmp += (TNumBasic) CharToUNum(str[i]) * DecPow(current_tmp);
 		current_tmp++;
 		//cout << "PNT1" << endl;
 		//cout << "TMP = " << tmp << endl;
 		//cout << "CURRENT_TMP = " << current_tmp << endl;
-		unsigned int dec_pow = DecPow(ATOM_SIZE);
+		TNumBasic dec_pow = DecPow(ATOM_SIZE);
 		if (current_tmp > ATOM_SIZE) {
-			unsigned int current_value = tmp % dec_pow;
+			TNumBasic current_value = tmp % dec_pow;
 			//size_t current_size = res.Atoms.size();
 			//cout << "current_size = " << current_size << endl;
 			if (!first) {
@@ -123,11 +123,11 @@ std::ostream &operator <<(std::ostream &os, TNumeral const &n) {
 
 		for (size_t j = n.Atoms.size(); j > 0; j--) {
 			size_t i = j - 1;
-			if (!first) {
+			/*if (!first) {
 				cout << ".";
-			}
-			unsigned int dec_pow = DecPow(ATOM_SIZE);
-			for (unsigned int k = 10; k < dec_pow; k *= 10) {
+			}*/
+			TNumBasic dec_pow = DecPow(ATOM_SIZE);
+			for (TNumBasic k = 10; k < dec_pow; k *= 10) {
 				if (n.Atoms[i] < k && !first) {
 					os << 0;
 					//cout << n.Atoms[i] << " < " << i << endl; 
@@ -219,7 +219,7 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 		return res;
 	}
 	
-	unsigned int tmp = 0;
+	TNumBasic tmp = 0;
 	
 	//res.Atoms.resize(max(a.Atoms.size(), b.Atoms.size()));
 	if (a.Atoms.size() > b.Atoms.size()) {
@@ -234,7 +234,7 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 		return res;
 	}*/
 	size_t max_i = min(a.Atoms.size(), b.Atoms.size());
-	unsigned int divider = DecPow(ATOM_SIZE);
+	TNumBasic divider = DecPow(ATOM_SIZE);
 	//cout << "max_i = " << max_i << endl;
 	for (size_t i = 0; i < max_i; i++) {
 		//cout << "i = " << i << endl;
@@ -273,8 +273,8 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 
 	res = a;
 	
-	unsigned int dec_pow = DecPow(ATOM_SIZE);
-	unsigned int max_atom = dec_pow - 1;
+	TNumBasic dec_pow = DecPow(ATOM_SIZE);
+	TNumBasic max_atom = dec_pow - 1;
 
 	for (size_t i = 0; i < b.Atoms.size(); i++) {
 		if (res.Atoms[i] < b.Atoms[i]) {
@@ -310,7 +310,7 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		return res;
 	}
 	
-	unsigned int tmp = 0;
+	TNumBasic tmp = 0;
 	
 	/*res.Atoms.resize(a.Atoms.size() + b.Atoms.size());
 	if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
@@ -318,8 +318,8 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		return res;
 	}*/
 	//size_t max_i = min(a.Atoms.size(), b.Atoms.size());
-	unsigned int divider = DecPow(ATOM_SIZE);
-	//unsigned int now_dec = 1;
+	TNumBasic divider = DecPow(ATOM_SIZE);
+	//TNumBasic now_dec = 1;
 
 	for (size_t j = 0; j < b.Atoms.size(); j++) {
 		tmp = 0;
@@ -341,14 +341,14 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		}
 
 		if (tmp != 0) {
-			cout << "j = " << j << endl;
-			cout << "Tmp = " << tmp << endl;
+			//cout << "j = " << j << endl;
+			//cout << "Tmp = " << tmp << endl;
 			size_t current = res_tmp.Atoms.size();
-			cout << "Current = " << current << endl;
+			//cout << "Current = " << current << endl;
 			res_tmp.Atoms.resize(res_tmp.Atoms.size() + 1);
 			res_tmp.Atoms[current] = tmp;
 		}
-		cout << "res_tmp = " << res_tmp << endl;
+		//cout << "res_tmp = " << res_tmp << endl;
 		res = res + res_tmp;
 		//now_dec *= 10;
 

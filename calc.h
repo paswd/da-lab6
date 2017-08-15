@@ -5,11 +5,14 @@
 #include <vector>
 #include <string>
 
-const size_t ATOM_SIZE = 3;
+//The best value is 6
+const size_t ATOM_SIZE = 6;
+
+typedef unsigned long long TNumBasic;
 
 class TNumeral {
 public:
-	std::vector <unsigned int> Atoms;
+	std::vector <TNumBasic> Atoms;
 	bool Error;
 
 	TNumeral(void);
