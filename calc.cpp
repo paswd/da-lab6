@@ -393,46 +393,42 @@ TNumeral operator /(TNumeral const &a, TNumeral const &b) {
 
 	TNumeral d_number;
 	d_number.Atoms[0] = DEC_POW_ATOM / (b.Atoms[b.Atoms.size() - 1] + 1);
-	TNumeral u = a * d_number;
-	TNumeral v = b * d_number;
+	TNumeral a_nw = a * d_number;
+	TNumeral b_nw = b * d_number;
 
-	res.Atoms.resize(u.Atoms.size());
+	res.Atoms.resize(a_nw.Atoms.size());
 
 	TNumeral r;
-	//r.number.push_back(0); // Что значит
 
 	TNumeral dpa = UNumToTNumeral(DEC_POW_ATOM);
 
-	for (size_t j = u.Atoms.size(); j > 0; j--) {
+	for (size_t j = a_nw.Atoms.size(); j > 0; j--) {
 		size_t i = j - 1;
 		r = r * dpa;
-		TNumeral u1 = UNumToTNumeral(u.Atoms[i]);
-		r = r + u1;
+		r = r + UNumToTNumeral(a_nw.Atoms[i]);
 
-		TNumBasic c1;
-		if(r.Atoms.size() <= v.Atoms.size()) {
-			c1 = 0;
+		TNumBasic c[2];
+		if(r.Atoms.size() <= b_nw.Atoms.size()) {
+			c[0] = 0;
 		} else {
-			c1 = r.Atoms[v.Atoms.size()];
+			c[0] = r.Atoms[b_nw.Atoms.size()];
 		}
 
-		TNumBasic c2;
-		if(r.Atoms.size() <= v.Atoms.size() - 1) {
-			c2 = 0;
+		if(r.Atoms.size() <= b_nw.Atoms.size() - 1) {
+			c[1] = 0;
 		} else {
-			c2 = r.Atoms[v.Atoms.size() - 1];
+			c[1] = r.Atoms[b_nw.Atoms.size() - 1];
 		}
 
-		TNumBasic q = (c1 * DEC_POW_ATOM + c2) / v.Atoms[v.Atoms.size() - 1];
+		TNumBasic tmp = (c[0] * DEC_POW_ATOM + c[1]) / b_nw.Atoms[b_nw.Atoms.size() - 1];
 
-		TNumeral q_number = UNumToTNumeral(q);
-		TNumeral sub = v * q_number;
+		TNumeral sub = b_nw * UNumToTNumeral(tmp);
 		while (sub > r) {
-			q--;
-			sub = sub - v;
+			tmp--;
+			sub = sub - b_nw;
 		}
 		r = r - sub;
-		res.Atoms[i] = q;
+		res.Atoms[i] = tmp;
 	}
 	res.RemovePreZeros();
 	return res;
