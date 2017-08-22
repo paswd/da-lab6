@@ -21,9 +21,13 @@ public:
 	TNumeral& operator =(const TNumeral &num);
 
 	bool IsZero(void) const;
+	bool IsEven(void) const;
+	void RemovePreZeros(void);
+	TNumeral Power(TNumeral pk);
 };
 
 TNumeral StrToTNumeral(std::string str);
+TNumeral UNumToTNumeral(size_t num);
 
 std::istream & operator >>(std::istream &is, TNumeral &n);
 std::ostream & operator <<(std::ostream &os, TNumeral const &n);
@@ -34,7 +38,6 @@ bool operator ==(TNumeral const &a, TNumeral const &b);
 bool operator <=(TNumeral const &a, TNumeral const &b);
 bool operator >=(TNumeral const &a, TNumeral const &b);
 
-//TNumeral& operator =(TNumeral &num);
 TNumeral operator +(TNumeral const &a, TNumeral const &b);
 TNumeral operator -(TNumeral const &a, TNumeral const &b);
 TNumeral operator *(TNumeral const &a, TNumeral const &b);

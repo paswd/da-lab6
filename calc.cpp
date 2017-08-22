@@ -27,6 +27,8 @@ TNumBasic DecPow(size_t index) {
 	return res;
 }
 
+const TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
+
 TNumeral& TNumeral::operator =(const TNumeral &num) {
 	this->Atoms.resize(num.Atoms.size());
 	for (size_t i = 0; i < this->Atoms.size(); i++) {
@@ -41,6 +43,24 @@ bool TNumeral::IsZero(void) const {
 	}
 	return false;
 }
+bool TNumeral::IsEven(void) const {
+	if (this->Atoms[0] % 2 == 0) {
+		return true;
+	}
+	return false;
+}
+void TNumeral::RemovePreZeros(void) {
+	size_t cnt = 0;
+	for (size_t i = this->Atoms.size(); i > 0; i--) {
+		//size_t i = j - 1;
+		if (this->Atoms[i - 1] != 0) {
+			break;
+		}
+		cnt++;
+	}
+	this->Atoms.resize(this->Atoms.size() - cnt);
+}
+
 TNumeral StrToTNumeral(string str) {
 	TNumeral res;
 	size_t begin = 0;
@@ -55,7 +75,6 @@ TNumeral StrToTNumeral(string str) {
 	if (real_size % ATOM_SIZE > 0) {
 		n_size++;
 	}
-	//cout << "N_SIZE = " << n_size << endl;
 	res.Atoms.resize(n_size);
 
 	size_t current_tmp = 0;
@@ -77,16 +96,16 @@ TNumeral StrToTNumeral(string str) {
 		//cout << "PNT1" << endl;
 		//cout << "TMP = " << tmp << endl;
 		//cout << "CURRENT_TMP = " << current_tmp << endl;
-		TNumBasic dec_pow = DecPow(ATOM_SIZE);
+		//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
 		if (current_tmp > ATOM_SIZE) {
-			TNumBasic current_value = tmp % dec_pow;
+			TNumBasic current_value = tmp % DEC_POW_ATOM;
 			//size_t current_size = res.Atoms.size();
 			//cout << "current_size = " << current_size << endl;
 			if (!first) {
 				current_size++;
 			}
 			res.Atoms[current_size] = current_value;
-			tmp /= dec_pow;
+			tmp /= DEC_POW_ATOM;
 			current_tmp = 1;
 			first = false;
 		}
@@ -110,6 +129,21 @@ TNumeral StrToTNumeral(string str) {
 	return res;
 }
 
+TNumeral UNumToTNumeral(size_t num) {
+	TNumeral res;
+	bool first = true;
+	while (num > 0) {
+		if (!first) {
+			res.Atoms.resize(res.Atoms.size() + 1);
+		}
+		first = false;
+		size_t current = res.Atoms.size() - 1;
+		res.Atoms[current] = num % DEC_POW_ATOM;
+		num /= DEC_POW_ATOM;
+	}
+	return res;
+}
+
 std::istream &operator >>(std::istream &is, TNumeral &n) {
 	string str;
 	is >> str;
@@ -126,8 +160,8 @@ std::ostream &operator <<(std::ostream &os, TNumeral const &n) {
 			/*if (!first) {
 				cout << ".";
 			}*/
-			TNumBasic dec_pow = DecPow(ATOM_SIZE);
-			for (TNumBasic k = 10; k < dec_pow; k *= 10) {
+			//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
+			for (TNumBasic k = 10; k < DEC_POW_ATOM; k *= 10) {
 				if (n.Atoms[i] < k && !first) {
 					os << 0;
 					//cout << n.Atoms[i] << " < " << i << endl; 
@@ -229,10 +263,6 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 	} else {
 		res.Atoms.resize(a.Atoms.size());
 	}
-	/*if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
-		res.Error = true;
-		return res;
-	}*/
 	size_t max_i = min(a.Atoms.size(), b.Atoms.size());
 	TNumBasic divider = DecPow(ATOM_SIZE);
 	//cout << "max_i = " << max_i << endl;
@@ -273,8 +303,8 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 
 	res = a;
 	
-	TNumBasic dec_pow = DecPow(ATOM_SIZE);
-	TNumBasic max_atom = dec_pow - 1;
+	//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
+	TNumBasic max_atom = DEC_POW_ATOM - 1;
 
 	for (size_t i = 0; i < b.Atoms.size(); i++) {
 		if (res.Atoms[i] < b.Atoms[i]) {
@@ -283,7 +313,7 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 				res.Atoms[j] = max_atom;
 			}
 			res.Atoms[j]--;
-			res.Atoms[i] += dec_pow;
+			res.Atoms[i] += DEC_POW_ATOM;
 		}
 		//cout << "a = " << res.Atoms[i] << " - " << b.Atoms[i] << endl;
 		res.Atoms[i] -= b.Atoms[i];
@@ -312,14 +342,7 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 	
 	TNumBasic tmp = 0;
 	
-	/*res.Atoms.resize(a.Atoms.size() + b.Atoms.size());
-	if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
-		res.Error = true;
-		return res;
-	}*/
-	//size_t max_i = min(a.Atoms.size(), b.Atoms.size());
 	TNumBasic divider = DecPow(ATOM_SIZE);
-	//TNumBasic now_dec = 1;
 
 	for (size_t j = 0; j < b.Atoms.size(); j++) {
 		tmp = 0;
@@ -350,15 +373,95 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		}
 		//cout << "res_tmp = " << res_tmp << endl;
 		res = res + res_tmp;
-		//now_dec *= 10;
-
-		/*if (res.Atoms.size() < a.Atoms.size() || res.Atoms.size() < b.Atoms.size()) {
-			res.Error = true;
-			res.Atoms.resize(0);
-			return res;
-		}*/
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 	return res;
+}
+
+TNumeral operator /(TNumeral const &a, TNumeral const &b) {
+	/*TNumeral zero = UNumToTNumeral(0);
+	if (a == zero) {
+		return zero;
+	}*/
+
+	TNumeral res;
+	
+	if(a < b || b.IsZero()) {
+		res.Error = true;
+		return res;
+	}
+
+	TNumeral d_number;
+	d_number.Atoms[0] = DEC_POW_ATOM / (b.Atoms[b.Atoms.size() - 1] + 1);
+	TNumeral u = a * d_number;
+	TNumeral v = b * d_number;
+
+	res.Atoms.resize(u.Atoms.size());
+
+	TNumeral r;
+	//r.number.push_back(0); // Что значит
+
+	TNumeral dpa = UNumToTNumeral(DEC_POW_ATOM);
+
+	for (size_t j = u.Atoms.size(); j > 0; j--) {
+		size_t i = j - 1;
+		r = r * dpa;
+		TNumeral u1 = UNumToTNumeral(u.Atoms[i]);
+		r = r + u1;
+
+		TNumBasic c1;
+		if(r.Atoms.size() <= v.Atoms.size()) {
+			c1 = 0;
+		} else {
+			c1 = r.Atoms[v.Atoms.size()];
+		}
+
+		TNumBasic c2;
+		if(r.Atoms.size() <= v.Atoms.size() - 1) {
+			c2 = 0;
+		} else {
+			c2 = r.Atoms[v.Atoms.size() - 1];
+		}
+
+		TNumBasic q = (c1 * DEC_POW_ATOM + c2) / v.Atoms[v.Atoms.size() - 1];
+
+		TNumeral q_number = UNumToTNumeral(q);
+		TNumeral sub = v * q_number;
+		while (sub > r) {
+			q--;
+			sub = sub - v;
+		}
+		r = r - sub;
+		res.Atoms[i] = q;
+	}
+	res.RemovePreZeros();
+	return res;
+}
+
+TNumeral TNumeral::Power(TNumeral pk) {
+	TNumeral one = UNumToTNumeral(1);
+	TNumeral two = UNumToTNumeral(2);
+	TNumeral res = one;
+	if (pk.IsZero()) {
+		if (this->IsZero()) {
+			res.Error = true;
+		}
+		return one;
+	}
+	if (this->IsZero()) {
+		res = UNumToTNumeral(0);
+		return res;
+	}
+
+	if (pk == one) {
+		return *this;
+	}
+	if (pk.IsEven()) {
+		TNumeral new_pk = pk / two;
+		res = this->Power(new_pk);
+		return res * res;
+	} else {
+		return this->Power(pk - one) * (*this);
+	}
 }
 
