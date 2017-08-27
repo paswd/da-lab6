@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const size_t SIZE_T_MAX = -1;
+//const size_t SIZE_T_MAX = 18446744073709551615;
 
 TNumeral::TNumeral(void) {
 	this->Atoms.resize(1);
@@ -50,6 +50,9 @@ bool TNumeral::IsEven(void) const {
 	return false;
 }
 void TNumeral::RemovePreZeros(void) {
+	if (this->Atoms.size() == 1) {
+		return;
+	}
 	size_t cnt = 0;
 	for (size_t i = this->Atoms.size(); i > 0; i--) {
 		//size_t i = j - 1;
@@ -233,6 +236,12 @@ bool operator ==(TNumeral const &a, TNumeral const &b) {
 	}
 	return true;
 }
+bool operator !=(TNumeral const &a, TNumeral const &b) {
+	if (a == b) {
+		return false;
+	}
+	return true;
+}
 bool operator <=(TNumeral const &a, TNumeral const &b) {
 	if (a < b || a == b) {
 		return true;
@@ -291,6 +300,8 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 		max_i++;
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
+
+	res.RemovePreZeros();
 	return res;
 }
 
@@ -325,6 +336,7 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 	}
 	res.Atoms.resize(a.Atoms.size() - pre_nulls_cnt);
 
+	res.RemovePreZeros();
 	return res;
 }
 
@@ -375,6 +387,7 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		res = res + res_tmp;
 	}
 	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
+	res.RemovePreZeros();
 	return res;
 }
 
@@ -385,8 +398,13 @@ TNumeral operator /(TNumeral const &a, TNumeral const &b) {
 	}*/
 
 	TNumeral res;
+
+	//Now `res` is zero
+	if ((a.IsZero() && !b.IsZero()) || a < b) {
+		return res;
+	}
 	
-	if(a < b || b.IsZero()) {
+	if(b.IsZero()) {
 		res.Error = true;
 		return res;
 	}
@@ -440,7 +458,7 @@ TNumeral TNumeral::Power(TNumeral pk) {
 	TNumeral res = one;
 	if (pk.IsZero()) {
 		if (this->IsZero()) {
-			res.Error = true;
+			one.Error = true;
 		}
 		return one;
 	}

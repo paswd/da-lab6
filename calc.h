@@ -35,6 +35,7 @@ std::ostream & operator <<(std::ostream &os, TNumeral const &n);
 bool operator <(TNumeral const &a, TNumeral const &b);
 bool operator >(TNumeral const &a, TNumeral const &b);
 bool operator ==(TNumeral const &a, TNumeral const &b);
+bool operator !=(TNumeral const &a, TNumeral const &b);
 bool operator <=(TNumeral const &a, TNumeral const &b);
 bool operator >=(TNumeral const &a, TNumeral const &b);
 
