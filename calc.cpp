@@ -8,8 +8,6 @@
 
 using namespace std;
 
-//const size_t SIZE_T_MAX = 18446744073709551615;
-
 TNumeral::TNumeral(void) {
 	this->Atoms.resize(1);
 	this->Atoms[0] = 0;
@@ -55,7 +53,6 @@ void TNumeral::RemovePreZeros(void) {
 	}
 	size_t cnt = 0;
 	for (size_t i = this->Atoms.size(); i > 0; i--) {
-		//size_t i = j - 1;
 		if (this->Atoms[i - 1] != 0) {
 			break;
 		}
@@ -93,17 +90,10 @@ TNumeral StrToTNumeral(string str) {
 			break;
 		}
 
-		//tmp *= 10;
 		tmp += (TNumBasic) CharToUNum(str[i]) * DecPow(current_tmp);
 		current_tmp++;
-		//cout << "PNT1" << endl;
-		//cout << "TMP = " << tmp << endl;
-		//cout << "CURRENT_TMP = " << current_tmp << endl;
-		//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
 		if (current_tmp > ATOM_SIZE) {
 			TNumBasic current_value = tmp % DEC_POW_ATOM;
-			//size_t current_size = res.Atoms.size();
-			//cout << "current_size = " << current_size << endl;
 			if (!first) {
 				current_size++;
 			}
@@ -112,22 +102,14 @@ TNumeral StrToTNumeral(string str) {
 			current_tmp = 1;
 			first = false;
 		}
-		//cout << "PNT2" << endl;
-		//cout << "TMP = " << tmp << endl;
-		//cout << "CURRENT_TMP = " << current_tmp << endl;
 	}
-	//cout << "N_SIZE1 = " << res.Atoms.size() << endl;
 	if (tmp != 0) {
 		size_t current_size = res.Atoms.size() - 1;
 		if (first) {
 			current_size = 0;
-		}/* else {
-			res.Atoms.resize(res.Atoms.size() + 1);
-			cout << "TRUE" << endl;
-		}*/
+		}
 		res.Atoms[current_size] = tmp;
 	}
-	//cout << "N_SIZE2 = " << res.Atoms.size() << endl;
 
 	return res;
 }
@@ -160,14 +142,9 @@ std::ostream &operator <<(std::ostream &os, TNumeral const &n) {
 
 		for (size_t j = n.Atoms.size(); j > 0; j--) {
 			size_t i = j - 1;
-			/*if (!first) {
-				cout << ".";
-			}*/
-			//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
 			for (TNumBasic k = 10; k < DEC_POW_ATOM; k *= 10) {
 				if (n.Atoms[i] < k && !first) {
 					os << 0;
-					//cout << n.Atoms[i] << " < " << i << endl; 
 				}
 			}
 
@@ -264,7 +241,6 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 	
 	TNumBasic tmp = 0;
 	
-	//res.Atoms.resize(max(a.Atoms.size(), b.Atoms.size()));
 	if (a.Atoms.size() > b.Atoms.size()) {
 		res = a;
 	} else if (a.Atoms.size() < b.Atoms.size()) {
@@ -274,17 +250,11 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 	}
 	size_t max_i = min(a.Atoms.size(), b.Atoms.size());
 	TNumBasic divider = DecPow(ATOM_SIZE);
-	//cout << "max_i = " << max_i << endl;
 	for (size_t i = 0; i < max_i; i++) {
-		//cout << "i = " << i << endl;
 		res.Atoms[i] = a.Atoms[i] + b.Atoms[i];
-		//cout << "res.Atoms[i] (0) = " << res.Atoms[i] << endl;
 		res.Atoms[i] += tmp;
-		//cout << "res.Atoms[i] (1) = " << res.Atoms[i] << endl;
 		tmp = res.Atoms[i] / divider;
 		res.Atoms[i] %= divider;
-		//cout << "res.Atoms[i] (2) = " << res.Atoms[i] << endl;
-		//cout << "res = " << res << endl;
 	}
 	while (tmp != 0) {
 		size_t current = max_i;
@@ -292,14 +262,11 @@ TNumeral operator +(TNumeral const &a, TNumeral const &b) {
 			res.Atoms.resize(current + 1);
 			res.Atoms[current] = 0;
 		}
-		/*size_t current = res.Atoms.size();
-		res.Atoms.resize(res.Atoms.size() + 1);*/
 		res.Atoms[current] += tmp;
 		tmp = res.Atoms[current] / divider;
 		res.Atoms[current] %= divider;
 		max_i++;
 	}
-	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 
 	res.RemovePreZeros();
 	return res;
@@ -314,7 +281,6 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 
 	res = a;
 	
-	//TNumBasic DEC_POW_ATOM = DecPow(ATOM_SIZE);
 	TNumBasic max_atom = DEC_POW_ATOM - 1;
 
 	for (size_t i = 0; i < b.Atoms.size(); i++) {
@@ -326,12 +292,10 @@ TNumeral operator -(TNumeral const &a, TNumeral const &b) {
 			res.Atoms[j]--;
 			res.Atoms[i] += DEC_POW_ATOM;
 		}
-		//cout << "a = " << res.Atoms[i] << " - " << b.Atoms[i] << endl;
 		res.Atoms[i] -= b.Atoms[i];
 	}
 	size_t pre_nulls_cnt = 0;
 	for (size_t i = res.Atoms.size() - 1; i > 0 && res.Atoms[i] == 0; i--) {
-		//cout << "true" << endl;
 		pre_nulls_cnt++;
 	}
 	res.Atoms.resize(a.Atoms.size() - pre_nulls_cnt);
@@ -376,27 +340,17 @@ TNumeral operator *(TNumeral const &a, TNumeral const &b) {
 		}
 
 		if (tmp != 0) {
-			//cout << "j = " << j << endl;
-			//cout << "Tmp = " << tmp << endl;
 			size_t current = res_tmp.Atoms.size();
-			//cout << "Current = " << current << endl;
 			res_tmp.Atoms.resize(res_tmp.Atoms.size() + 1);
 			res_tmp.Atoms[current] = tmp;
 		}
-		//cout << "res_tmp = " << res_tmp << endl;
 		res = res + res_tmp;
 	}
-	//cout << "res.Atoms.size() = " << res.Atoms.size() << endl;
 	res.RemovePreZeros();
 	return res;
 }
 
 TNumeral operator /(TNumeral const &a, TNumeral const &b) {
-	/*TNumeral zero = UNumToTNumeral(0);
-	if (a == zero) {
-		return zero;
-	}*/
-
 	TNumeral res;
 
 	//Now `res` is zero

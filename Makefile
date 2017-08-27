@@ -7,7 +7,7 @@ start: converter.o calc.o main.o
 	$(COMPILLER) $(FLAGS) -o da-lab6 converter.o calc.o main.o
 
 main.o: main.cpp
-	@$(COMPILLER) -c $(FLAGS) main.cpp
+	$(COMPILLER) -c $(FLAGS) main.cpp
 
 converter.o: converter.cpp
 	$(COMPILLER) -c $(FLAGS) converter.cpp

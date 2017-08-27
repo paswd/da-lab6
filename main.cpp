@@ -12,17 +12,6 @@ void PrintBool(bool value) {
 }
 
 int main(void) {
-	/*TNumeral a;
-	TNumeral b;
-	cin >> a >> b;
-	//cout << a << endl;
-	//cout << b << endl;
-	cout << a.Power(b) << endl;
-	size_t num;
-	cin >> num;
-	TNumeral res = UNumToTNumeral(num);
-	cout << res << endl;*/
-
 	TNumeral a, b;
 	char op;
 
